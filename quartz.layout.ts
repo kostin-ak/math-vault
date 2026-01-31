@@ -1,6 +1,6 @@
 import { PageLayout, SharedLayout } from "./quartz/cfg"
 import * as Component from "./quartz/components"
-import TikzJax from "./components/TikzJax" 
+import TikzJax from "./quartz/components/TikzJax"
 
 // components shared across all pages
 export const sharedPageComponents: SharedLayout = {
