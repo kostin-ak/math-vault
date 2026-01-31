@@ -1,6 +1,5 @@
 import { QuartzConfig } from "./quartz/cfg"
 import * as Plugin from "./quartz/plugins"
-import { Tikz } from "./quartz/plugins/transformers/tikz"
 
 
 /**
@@ -8,6 +7,7 @@ import { Tikz } from "./quartz/plugins/transformers/tikz"
  *
  * See https://quartz.jzhao.xyz/configuration for more information.
  */
+
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "Quartz 4",
@@ -61,7 +61,6 @@ const config: QuartzConfig = {
       Plugin.CreatedModifiedDate({
         priority: ["frontmatter", "git", "filesystem"],
       }),
-      Tikz(),
       Plugin.SyntaxHighlighting({
         theme: {
           light: "github-light",

@@ -4,13 +4,17 @@ import { visit } from "unist-util-visit"
 export const Tikz: QuartzTransformerPlugin = () => {
   return {
     name: "Tikz",
-    markdown: (tree) => { // Обратите внимание: markdown, а не html
+    markdown: (tree, file) => { // Добавили аргумент file, чтобы знать имя файла
       visit(tree, "code", (node: any) => {
-        // Проверяем язык блока ```tikz
+        // Выводим в консоль каждый найденный блок кода
+        console.log(`[DEBUG] File: ${file.path}, Lang: '${node.lang}', Meta: '${node.meta}'`)
+
         if (node.lang === "tikz") {
-          // Превращаем блок кода в HTML-узел (прямая инъекция)
+          console.log("--> MATCH! Converting to script...")
           node.type = "html"
           node.value = `<script type="text/tikz">\n${node.value}\n</script>`
+          delete node.lang
+          delete node.meta
         }
       })
     },
