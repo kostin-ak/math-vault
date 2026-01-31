@@ -5,44 +5,31 @@ export const Tikz: QuartzTransformerPlugin = () => {
   return {
     name: "Tikz",
     html: (tree) => {
-      // Ищем <pre><code class="language-tikz">...
       visit(tree, "element", (node: any, index, parent: any) => {
-        if (node.tagName === "figure" && node.properties?.["data-rehype-pretty-code-figure"] !== undefined) {
-           // Внутри figure ищем pre
-           const pre = node.children.find((n: any) => n.tagName === "pre")
-           if (!pre) return
-
-           // Внутри pre ищем code
-           const code = pre.children.find((n: any) => n.tagName === "code")
-           if (!code) return
-
-           // Проверяем язык
-           if (pre.properties?.["data-language"] === "tikz" || code.properties?.["data-language"] === "tikz") {
+        // Ищем стандартный блок кода: <pre><code class="language-tikz">
+        if (node.tagName === "pre" && node.children?.[0]?.tagName === "code") {
+          const codeNode = node.children[0]
+          const className = codeNode.properties?.className || []
+          
+          // Проверяем, есть ли класс language-tikz
+          if (className.some((c: string) => c === "language-tikz" || c === "tikz")) {
+             // Достаем исходный текст (он тут еще целый, одной строкой)
+             const text = codeNode.children[0]?.value || ""
              
-             // САМОЕ ВАЖНОЕ: Нам нужно достать исходный текст кода.
-             // Shiki уже разбил его на span'ы. Собираем обратно.
-             let rawCode = ""
-             
-             const extractText = (n: any) => {
-                if (n.type === 'text') rawCode += n.value
-                if (n.children) n.children.forEach(extractText)
-             }
-             extractText(code)
-
-             // Заменяем весь <figure> на <script type="text/tikz">
-             // TikZJax сам создаст SVG на этом месте.
+             // Заменяем <pre>...</code> на <script type="text/tikz">...</script>
              parent.children[index] = {
                type: "element",
                tagName: "script",
                properties: {
                  type: "text/tikz",
+                 // Можно добавить data-show-console="true" для отладки, если не рисует
                },
                children: [{
                  type: "text",
-                 value: rawCode.trim()
+                 value: text
                }]
              }
-           }
+          }
         }
       })
       return tree
